@@ -8,8 +8,7 @@ var func = require("./function");
 
 //将url路径对应到相应的函数
 var handle = {};
-handle["/"] = func.select;
-handle["/select"] = func.select;
+handle["/select_scenes"] = func.select_scenes;
 
 //构造连接数据库的连接字符串："tcp://用户名:密码@ip/相应的数据库名"
 var conString = "tcp://postgres:postgres@localhost/klkjpgdb";

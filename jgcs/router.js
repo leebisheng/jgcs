@@ -1,8 +1,9 @@
 ﻿var fs = require('fs');
 function route(client,handle,pathname,response){
-    if(typeof handle[pathname] === 'select')
+
+    if(typeof handle[pathname] === 'select_scenes')
     {
-    	
+				console.log("before select");
        handle[pathname](client,response);  //执行对应的函数
     }
     else

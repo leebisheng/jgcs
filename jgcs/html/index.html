@@ -49,13 +49,41 @@
 	<script src="../three/js/loaders/DDSLoader.js"></script>
 	<script src="../three/js/loaders/MTLLoader.js"></script>
 	<script src="../three/js/loaders/OBJLoader.js"></script>
-
+	
 	<script>
   	$(function() {
     	$( "#tabs" ).tabs();
   	});
-  </script>
-         	
+  </script>	
+  <script>
+  	$(function() {
+  		
+  				var init_scene=function()
+  				{
+  					alert("HI2");
+  					$.post("/select_scenes",
+  								{name:"table",col:"ID"},
+									function(data,status)
+											{
+													alert("数据: \n" + data + "\n状态: " + status);
+											}
+						);
+  					$("#select_scene").append("<option value='Value'>自动加载场景1</option>"); //为Select追加一个Option(下拉项) 
+  					$("#select_scene").append("<option value='Value'>自动加载场景2</option>"); //为Select追加一个Option(下拉项)
+  					$("#select_scene").append("<option value='Value'>自动加载场景3</option>"); //为Select追加一个Option(下拉项)
+  					//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
+  				}();
+  					
+					$("#select_scene").change(function(){
+					
+					var checkText=$("#select_scene").find("option:selected").text(); //获取Select选择的Text 
+					alert("checkText:"+checkText);
+					var checkValue=$("#select_scene").val(); //获取Select选择的Value 
+					alert("checkValue:"+checkValue);
+					
+					}); //为Select添加选择事件 
+			});
+				</script>
   <script>
 	  $(function() {
 
@@ -140,18 +168,17 @@
 	    });
 		});
 	</script>
-	
-  	
+	  	
 </head>
 <body>
 	
 	<div class="page-header">
-		<h1>酷联科技 
-			<small>    井盖磁场测试系统</small> 
+		<h1 style="font-family:'微软雅黑';">酷联科技 
+			<small style="font-family:'微软雅黑';">    井盖磁场测试系统</small> 
 		</h1>
 	</div>
-	<div id=tabs>
-		<ul id="tab0" >
+	<div id=tabs >
+		<ul id="tab0">
 	   	<li class="active">
 	      <a href="#3dzs" data-toggle="tab">
 	         3D实时展示
@@ -183,8 +210,16 @@
 		<div id="myTabContent" class="tab-content">
 			 
 	  	<div class="tab-pane fade in active" id="3dzs" >
+	  		
+	  		<form action="">
+	  		<label for="name" >当前测试场景</label>
+					<select id="select_scene" class="scene_list">
+						<option>请选择场景！</option>
+					</select>
+	  		</form>
+	  		
+	  		
 	  		<div id="3dzs_canvas" >
-	  			<p>3d实时 </p>
 	  			<script src="../lee_js/3Dzs.js"></script>
 					<script>
 						init();
