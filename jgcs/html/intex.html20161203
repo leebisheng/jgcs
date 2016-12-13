@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <title>云南酷联科技有限公司测试平台</title>
+ 
+
+   	<link rel="stylesheet" href="../bootstrap-3.3.7-dist/css/bootstrap.min.css"> 
+   	<script type="text/javascript" src="../bootstrap-3.3.7-dist/js/jquery-3.1.1.js"></script> 
+		<script type="text/javascript" src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/three.js"></script>
+		<script type="text/javascript" src="../js/three.min.js"></script>
+    //<script type="text/javascript" src="../js/lee_js/jgcccs3d.js"></script>
+		<script type="text/javascript" src="../js/OBJLoader.js"></script>
+
+</head>
+<body>
+<div class="page-header">
+<h1>酷联科技 <small>    井盖磁场测试系统</small></h1>
+</div>
+
+<ul id="tab0" class="nav nav-tabs">
+   <li class="active">
+      <a href="#3dzs" data-toggle="tab">
+         3D实时展示
+      </a>
+   </li>
+   
+   <li>
+   	<a href="#3dhzs"  data-toggle="tab">
+   		3D历史展示
+   	</a>
+   </li>
+   	
+   <li class="dropdown">
+      <a href="#cjgl"  id="myTabDrop1" class="dropdown-toggle" 
+         data-toggle="dropdown">场景管理 
+         <b class="caret"></b>
+      </a>
+      
+      <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+         <li><a href="#cjwh" tabindex="-1" data-toggle="tab">场景维护</a></li>
+         <li><a href="#glcj" tabindex="-1" data-toggle="tab">关联场景</a></li>
+      </ul>
+   </li>
+</ul>
+
+<div id="myTabContent" class="tab-content">
+   <div class="tab-pane fade in active" id="3dzs">
+      <p>测试数据，实时3D展示</p>
+      <canvas id="three_canvas" width="400px" height="300px" ></canvas>
+      <button id="turnBtn" class="btn btn-info" onclick="turn()">Turn</button>
+	 		<button id="stopBtn" class="btn btn-info"  onclick="stop()">Stop</button>
+  	 	<button id="startBtn" class="btn btn-info" onclick="start()">Start</button>
+  	 	
+  	 	<script>
+   		//	window.onload = threeStart();
+			</script>
+   </div>
+   
+   <div class="tab-pane fade" id="3dhzs">
+      <p>历史数据3D展示</p>
+      <canvas id="three_canvas1" width="400px" height="300px" ></canvas>
+      <script>
+	      var scene = null;
+	      var camera = null;
+	      var renderer = null;
+	            
+	      var mesh = null;
+	      var id = null;
+	            
+	      function init() {
+	     		renderer = new THREE.WebGLRenderer({//渲染器
+	                    canvas: document.getElementById('three_canvas1')//画布
+	                });
+	        renderer.setClearColor(0xffffff);//画布颜色
+	        scene = new THREE.Scene();//创建场景
+	                
+	        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);//正交投影照相机
+	        camera.position.set(15, 25, 25);//相机位置
+	        camera.lookAt(new THREE.Vector3(0, 2, 0));//lookAt()设置相机所看的位置
+	        scene.add(camera);//把相机添加到场景中
+	                
+	        var loader = new THREE.OBJLoader();//在init函数中，创建loader变量，用于导入模型
+	        loader.load('../3d_obj/CoverQTModel-open.obj', function(obj) {//第一个表示模型路径，第二个表示完成导入后的回调函数，一般我们需要在这个回调函数中将导入的模型添加到场景中
+	                    obj.traverse(function(child) {
+	                        if (child instanceof THREE.Mesh) {
+	                            child.material.side = THREE.DoubleSide;
+	                        }
+	                    });
+	                
+	                    mesh = obj;//储存到全局变量中
+	                    scene.add(obj);//将导入的模型添加到场景中
+	                });
+	                
+	         var light = new THREE.DirectionalLight(0xffffff);//光源颜色
+	         light.position.set(20, 10, 5);//光源位置
+	         scene.add(light);//光源添加到场景中
+	                
+	                
+	      }
+	            
+	      function draw() {
+	            		requestAnimationFrame(draw);
+	                mesh.rotation.y += 0.01;//添加动画
+                if (mesh.rotation.y > Math.PI * 2) {
+                    mesh.rotation.y -= Math.PI * 2;
+                }
+	                
+	               
+	                 renderer.render(scene, camera);//调用WebGLRenderer的render函数刷新场景
+	      }
+	      function start(){
+	      	init();
+	        draw();
+	      }
+	     	start();
+     	</script>
+   </div>
+   
+   <div class="tab-pane fade" id="cjwh">
+      <p>场景管理，录入场景 </p>
+   </div>
+   
+      <div class="tab-pane fade" id="glcj">
+      <p>场景管理， 关联场景</p>
+   </div>
+  
+   </div>
+
+</body>
+</html>

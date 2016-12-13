@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" > 
+	<meta http-equiv="Content-Type" content="text/css .css; charset=utf-8" > 
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>云南酷联科技有限公司</title>
+
+
+	
+	<!--  JQUERY -->
+	<script src="../bootstrap-3.3.7-dist/js/jquery-3.1.1.min.js"></script>
+
+	<!--  BOOTSTRAP -->
+	<link href="../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+  <!--  JQUERY-UI (only sortable and datepicker is needed) -->
+	<link rel="stylesheet" type="text/css" href="../jquery-ui-1.12.1/jquery-ui.min.css">
+	<script type="text/javascript" src="../jquery-ui-1.12.1/jquery-ui.min.js"></script>
+	
+	<!--  if timepicker is used in filters -->
+	<link rel="stylesheet" type="text/css" href="../timepicker/jquery-ui-timepicker-addon.min.css"/>
+	<script type="text/javascript" src="../timepicker/jquery-ui-timepicker-addon.min.js"></script>
+	<!--  if touch event support is needed (mobile devices) -->
+	<script type="text/javascript" src="../timepicker/jquery.ui.touch-punch.min.js"></script>
+ 
+	<!--  PAGINATION plugin -->
+	<link rel="stylesheet" type="text/css" href="../bs_pagination/jquery.bs_pagination.min.css">
+	<script type="text/javascript" src="../bs_pagination/jquery.bs_pagination.min.js"></script>
+	<script type="text/javascript" src="../bs_pagination/localization/en.min.js"></script>
+
+	<!--  FILTERS plugin --> 
+	<link rel="stylesheet" type="text/css" href="../jui_filter_rules/jquery.jui_filter_rules.bs.min.css">
+	<script type="text/javascript" src="../jui_filter_rules/jquery.jui_filter_rules.min.js"></script>
+	<script type="text/javascript" src="../jui_filter_rules/localization/en.min.js"></script>
+	<!--  required from filters plugin -->
+	<script type="text/javascript" src="../moment/moment.min.js"></script>
+
+	<!--  DATAGRID plugin -->
+	<link rel="stylesheet" type="text/css" href="../bs_grid/jquery.bs_grid.min.css">
+	<script type="text/javascript" src="../bs_grid/jquery.bs_grid.min.js"></script>
+	<script type="text/javascript" src="../bs_grid/localization/en.js"></script>
+
+	<!--  three.js -->
+	<script src="../three/js/build/three.js"></script>
+	<script src="../three/js/Detector.js"></script>
+	<script src="../three/js/controls/OrbitControls.js"></script>
+	<script src="../three/js/loaders/DDSLoader.js"></script>
+	<script src="../three/js/loaders/MTLLoader.js"></script>
+	<script src="../three/js/loaders/OBJLoader.js"></script>
+
+	<script>
+  	$(function() {
+    	$( "#tabs" ).tabs();
+  	});
+  </script>
+         	
+  <script>
+	  $(function() {
+
+			$("#cjwh_grid").bs_grid({
+
+	        //ajaxFetchDataURL: "ajax_fetch_page_data.php",
+	        row_primary_key: "customer_id",
+					//bootstrap_version: "3",
+	        columns: [
+	            {field: "customer_id", header: "Code", visible: "no"},
+	            {field: "lastname", header: "Lastname"},
+	            {field: "firstname", header: "Firstname"},
+	            {field: "email", header: "Email", visible: "no", "sortable": "no"},
+	            {field: "gender", header: "Gender"},
+	            {field: "date_updated", header: "Date updated"}
+	        ],
+
+	        sorting: [
+	            {sortingName: "Code", field: "customer_id", order: "none"},
+	            {sortingName: "Lastname", field: "lastname", order: "ascending"},
+	            {sortingName: "Firstname", field: "firstname", order: "ascending"},
+	            {sortingName: "Date updated", field: "date_updated", order: "none"}
+	        ],
+
+	        filterOptions: {
+	            filters: [
+	                {
+	                    filterName: "Lastname", "filterType": "text", field: "lastname", filterLabel: "Last name",
+	                    excluded_operators: ["in", "not_in"],
+	                    filter_interface: [
+	                        {
+	                            filter_element: "input",
+	                            filter_element_attributes: {"type": "text"}
+	                        }
+	                    ]
+	                },
+	                {
+	                    filterName: "Gender", "filterType": "number", "numberType": "integer", field: "lk_genders_id", filterLabel: "Gender",
+	                    excluded_operators: ["equal", "not_equal", "less", "less_or_equal", "greater", "greater_or_equal"],
+	                    filter_interface: [
+	                        {
+	                            filter_element: "input",
+	                            filter_element_attributes: {type: "checkbox"}
+	                        }
+	                    ],
+	                    lookup_values: [
+	                        {lk_option: "Male", lk_value: "1"},
+	                        {lk_option: "Female", lk_value: "2", lk_selected: "yes"}
+	                    ]
+	                },
+	                {
+	                    filterName: "DateUpdated", "filterType": "date", field: "date_updated", filterLabel: "Datetime updated",
+	                    excluded_operators: ["in", "not_in"],
+	                    filter_interface: [
+	                        {
+	                            filter_element: "input",
+	                            filter_element_attributes: {
+	                                type: "text",
+	                                title: "Set the date and time using format: dd/mm/yyyy hh:mm:ss"
+	                            },
+	                            filter_widget: "datetimepicker",
+	                            filter_widget_properties: {
+	                                dateFormat: "dd/mm/yy",
+	                                timeFormat: "HH:mm:ss",
+	                                changeMonth: true,
+	                                changeYear: true,
+	                                showSecond: true
+	                            }
+	                        }
+	                    ],
+	                    validate_dateformat: ["DD/MM/YYYY HH:mm:ss"],
+	                    filter_value_conversion: {
+	                        function_name: "local_datetime_to_UTC_timestamp",
+	                        args: [
+	                            {"filter_value": "yes"},
+	                            {"value": "DD/MM/YYYY HH:mm:ss"}
+	                        ]
+	                    }
+	                }
+	            ]
+	        }
+	    });
+		});
+	</script>
+	
+  	
+</head>
+<body>
+	
+	<div class="page-header">
+		<h1>酷联科技 
+			<small>    井盖磁场测试系统</small> 
+		</h1>
+	</div>
+	<div id=tabs>
+		<ul id="tab0" >
+	   	<li class="active">
+	      <a href="#3dzs" data-toggle="tab">
+	         3D实时展示
+	      </a>
+	      
+	   	</li>
+	   
+	   	<li>
+	   		<a href="#3dhzs"  data-toggle="tab">
+	   			3D历史展示
+	   		</a>
+	   	</li>
+	   	
+	   	<li>
+	   		<a href="#cjwh" data-toggle="tab">
+	   			场景维护
+	   		</a>
+	   		
+	   	</li>
+	   	
+	    <li>
+	    	<a href="#glcj"  data-toggle="tab">
+	    		关联场景
+	    	</a>
+	    </li>
+
+		</ul>
+
+		<div id="myTabContent" class="tab-content">
+			 
+	  	<div class="tab-pane fade in active" id="3dzs" >
+	  		<div id="3dzs_canvas" >
+	  			<p>3d实时 </p>
+	  			<script src="../lee_js/3Dzs.js"></script>
+					<script>
+						init();
+						animate();
+					</script>
+				</div>
+			</div>
+			
+			<div class="tab-pane fade in active" id="3dhzs">
+			 <p>3d历史 </p>
+			</div>
+	   
+	   	<div class="tab-pane fade" id="cjwh">
+	      <p>场景维护 </p>
+	   		  
+	      <div id="cjwh_grid" title="hello">
+	      	
+					
+	      </div>
+	
+	      
+	   	</div>
+	   
+	    <div class="tab-pane fade" id="glcj">
+	      <p>关联场景</p>
+	        <div id="glcj_grid">
+	      	
+					
+	      </div>
+	   	</div>
+	  
+		</div>
+	</div>
+</body>
+</html>
