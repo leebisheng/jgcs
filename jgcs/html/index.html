@@ -5,8 +5,6 @@
 	<meta http-equiv="Content-Type" content="text/css .css; charset=utf-8" > 
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>云南酷联科技有限公司</title>
-
-
 	
 	<!--  JQUERY -->
 	<script src="../bootstrap-3.3.7-dist/js/jquery-3.1.1.min.js"></script>
@@ -49,6 +47,86 @@
 	<script src="../three/js/loaders/DDSLoader.js"></script>
 	<script src="../three/js/loaders/MTLLoader.js"></script>
 	<script src="../three/js/loaders/OBJLoader.js"></script>
+	<!--  3dzs -->
+	<script src="../lee_js/3Dzs.js"></script>
+	
+	<script>
+		//全局变量
+		var gSceneNum=0;//scene number
+		var gSensorNum=0;//sensor number   
+		var gSceneID=0;//the current scene
+		var gSceneList=new Array();//gSensorVector inside
+		var gSensorVector =new Array();//the current sensor posision,THREE.Vector3 inside
+		var gRadius=6; //
+		//全局函数
+		function ss3dzs()
+		{
+			
+						init(gSensorNum,gSensorVector);
+						if(gSceneID==0)//demo mode
+						{
+							animate(true);
+						}
+						else 
+						{
+							animate(false);
+						}
+						
+		}
+		//++++++++++++++  init +++++++++++++++++++++++++++
+		//在没有选择场景之前，展示demo
+		var vector=new Array();
+		gSensorNum=8
+		for(var j=0;j<gSensorNum;j++)
+		{
+				vector[j]=new THREE.Vector3(gRadius*Math.cos((2*Math.PI/gSensorNum)*j),gRadius*Math.sin((2*Math.PI/gSensorNum)*j),0);
+		}
+		gSensorVector=vector;
+		gSceneList[0]=vector;
+
+		//get scene
+		$.post("/select_scenes",
+  					{name:"table",col:"ID"},
+						function(data,status)
+						{
+							if(status=="success")
+							{ 
+								gSceneNum=data.rowCount;
+								for(var i=0;i<gSceneNum;i++)
+								{
+									var str1="No sensor!";
+									var sensorVector=[];
+									if(data.rows[i].SENSOR != null)
+									{
+										var  sensor=data.rows[i].SENSOR;
+										var sensor_num=sensor.sensors.length;
+										
+										str1="";
+										for(var j=0;j<sensor_num;j++)
+										{
+											str1=str1+"   编号:"+sensor.sensors[j].id+" 放置角度："+sensor.sensors[j].angle;
+											
+											//get posision of sensor
+											var angle=((sensor.sensors[j].angle)/360)*2*Math.PI;//;
+											var vector=new THREE.Vector3(gRadius*Math.cos(i*angle),gRadius*Math.sin(i*angle),0);
+											sensorVector[j]=vector;
+											
+										}
+									}
+									gSceneList[i+1]=sensorVector;
+									var str2="<option value='"+data.rows[i].ID+"'> 场景"+data.rows[i].ID+": "+data.rows[i].NAME+"  描述："+data.rows[i].DESC+"  传感器分布："+str1+"</option>";
+									$("#select_scene").append(str2); //为Select追加一个Option(下拉项) 
+  								//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
+								}
+							}
+							else
+								alert("读数据库失败，系统将无法正常工作！");
+						}
+				);
+		//+++++++++++++++++++++++++++++++++++++++++
+	</script>
+	
+	
 	
 	<script>
   	$(function() {
@@ -58,48 +136,19 @@
   <script>
   	$(function() {
   		
-  				var init_scene=function()
-  				{
-  					$.post("/select_scenes",
-  								{name:"table",col:"ID"},
-									function(data,status)
-											{
-												if(status=="success")
-												{ 
-													var rowCount=data.rowCount;
-													for(var i=0;i<rowCount;i++)
-													{
-														var str1="No sensor!";
-														if(data.rows[i].SENSOR != null)
-														{
-															var  sensor=data.rows[i].SENSOR;
-															var sensor_cnt=sensor.sensors.length;
-															str1="";
-															for(var j=0;j<sensor_cnt;j++)
-															{
-																str1=str1+"   编号:"+sensor.sensors[j].id+" 放置角度："+sensor.sensors[j].angle;
-															}
-														}
-														var str2="<option value='"+data.rows[i].ID+"'> 场景"+data.rows[i].ID+": "+data.rows[i].NAME+"  描述："+data.rows[i].DESC+"  传感器分布："+str1+"</option>";
-														$("#select_scene").append(str2); //为Select追加一个Option(下拉项) 
-  													//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
-													}
-												}
-												else
-													alert("select_scenes failed");
-											}
-						);
-   				}();
-  					
+ 					
 					$("#select_scene").change(function(){
 					
-						var checkText=$("#select_scene").find("option:selected").text(); //获取Select选择的Text 
-						alert("checkText:"+checkText);
-						var checkValue=$("#select_scene").val(); //获取Select选择的Value 
-						alert("checkValue:"+checkValue);
-						
-						
-					
+						//var checkText=$("#select_scene").find("option:selected").text(); //获取Select选择的Text 
+						//alert("checkText:"+checkText);
+						//var checkValue=$("#select_scene").val(); //获取Select选择的Value 
+						//alert("checkValue:"+checkValue);
+						gSceneID=$("#select_scene").val()
+						alert("gSceneID:"+gSceneID);
+						gSensorVector=gSceneList[gSceneID];
+            gSensorNum=gSensorVector.length;
+						$("#3dzs_canvas").empty(); 
+						ss3dzs()
 					}); //为Select添加选择事件 
 			});
 				</script>
@@ -198,32 +247,10 @@
 	</div>
 	<div id=tabs >
 		<ul id="tab0">
-	   	<li class="active">
-	      <a href="#3dzs" data-toggle="tab">
-	         3D实时展示
-	      </a>
-	      
-	   	</li>
-	   
-	   	<li>
-	   		<a href="#3dhzs"  data-toggle="tab">
-	   			3D历史展示
-	   		</a>
-	   	</li>
-	   	
-	   	<li>
-	   		<a href="#cjwh" data-toggle="tab">
-	   			场景维护
-	   		</a>
-	   		
-	   	</li>
-	   	
-	    <li>
-	    	<a href="#glcj"  data-toggle="tab">
-	    		关联场景
-	    	</a>
-	    </li>
-
+	   	<li class="active">  <a href="#3dzs" data-toggle="tab"> 3D实时展示 </a>  	</li>
+	   	<li><a href="#3dhzs"  data-toggle="tab">3D历史展示</a></li>
+	   	<li><a href="#cjwh" data-toggle="tab">场景维护</a></li>
+	   	<li><a href="#glcj"  data-toggle="tab">关联场景</a></li>
 		</ul>
 
 		<div id="myTabContent" class="tab-content">
@@ -233,16 +260,16 @@
 	  		<form action="">
 	  		<label for="name" >当前测试场景</label>
 					<select id="select_scene" class="scene_list">
-						<option>请选择场景！</option>
+						<option value=0 >请选择场景！</option>
 					</select>
 	  		</form>
 	  		
 	  		
 	  		<div id="3dzs_canvas" >
-	  			<script src="../lee_js/3Dzs.js"></script>
+	  			
 					<script>
-						init();
-						animate();
+						ss3dzs()
+					
 					</script>
 				</div>
 			</div>

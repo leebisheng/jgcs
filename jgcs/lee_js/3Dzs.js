@@ -5,9 +5,8 @@
 			var width ;
    		var height ;
 			
-			function init() 
+			function init(pointer_cnt,vector) 
 			{
-				alert("in init()");
 				width = 1600;//document.getElementById('3dzs_canvas').clientWidth;//获取画布「canvas3d」的宽
    			height =600;//document.getElementById('3dzs_canvas').clientHeight;//获取画布「canvas3d」的高
    			
@@ -48,18 +47,14 @@
 				geometry.rotateX( Math.PI / 2 );
 
 				var material = new THREE.MeshNormalMaterial();
-				var pointer_cnt=8;						//----手工修改---
-				var radius=6;               //----手工修改----
 				pointerArray[0]=pointer_cnt;
 				
-				var angle=2*Math.PI/pointer_cnt;
 				for ( var i = 0; i < pointer_cnt; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
-					var vector=new THREE.Vector3(radius*Math.cos(i*angle),radius*Math.sin(i*angle),0);
-					mesh.position.x = vector.x ;
-					mesh.position.y = vector.y;
-					mesh.position.z = vector.z;
+					mesh.position.x = vector[i].x ;
+					mesh.position.y = vector[i].y;
+					mesh.position.z = vector[i].z;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					scene.add( mesh );
 					
@@ -96,10 +91,11 @@
 
 			}
 			
-			function animate() 
+			function animate(demo) 
 			{
 				requestAnimationFrame( animate );
-				render_demo();
+				if(demo)render_demo();
+				else render
 			}
 			
 			function render() 
@@ -112,7 +108,7 @@
 					//1是camera 2是grid 3才是Pointer 注意看前面的scene.add
 					//scene.children[ 3].rotateOnAxis(pointerArray[i-2],Math.random()*0.01);
 					//scene.children[ i].scale.z=Math.random()*10;
-					scene.children[ i ].lookAt(vector3  );
+					//cene.children[ i ].lookAt(vector3  );
 				}
 				renderer.render( scene, camera );
 
