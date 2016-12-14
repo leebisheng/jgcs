@@ -5,8 +5,9 @@
 			var width ;
    		var height ;
 			
-			function init() {
-				
+			function init() 
+			{
+				alert("in init()");
 				width = 1600;//document.getElementById('3dzs_canvas').clientWidth;//获取画布「canvas3d」的宽
    			height =600;//document.getElementById('3dzs_canvas').clientHeight;//获取画布「canvas3d」的高
    			
@@ -36,40 +37,12 @@
 				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
 
 				scene.add( camera );
-			//grid
+				//grid
 				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
 				grid.position= new THREE.Vector3(0,0,0);
 				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI/180 ) );
 				scene.add( grid );
-				
-			// load 	
-				//var mtlLoader = new THREE.MTLLoader();
-				//mtlLoader.setPath( '../3d_obj/' );
-				//mtlLoader.load( 'CoverQTModel-open.mtl', function( materials ) {
-        //
-				//	materials.preload();
-        //
-				//	var objLoader = new THREE.OBJLoader();
-				//	objLoader.setMaterials( materials );
-				//	objLoader.setPath( '../3d_obj/' );
-				//	objLoader.load( 'CoverQTModel-open.obj', function ( object ) {
-        //
-				//		object.position.z = 0;
-				//		scene.add( object );
-        //
-				//	}, onProgress, onError );
-				//	
-				//});
-				//
-				//var onProgress = function ( xhr ) {
-				//	if ( xhr.lengthComputable ) {
-				//		var percentComplete = xhr.loaded / xhr.total * 100;
-				//		console.log( Math.round(percentComplete, 2) + '% downloaded' );
-				//	}
-				//};
-        //
-				//var onError = function ( xhr ) { };
-				
+							
 				//pointer
 				var geometry = new THREE.CylinderGeometry( 0, 0.1, 3, 60 );//顶面积0，底面积1，高30，圆分割120
 				geometry.rotateX( Math.PI / 2 );
@@ -105,6 +78,7 @@
 			}
 
 			function onWindowResize() {
+				
 
 				camera.aspect = width /height;
 				camera.updateProjectionMatrix();
@@ -114,21 +88,22 @@
 				render();
 
 			}
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove(event) 
+			{
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;
 
 			}
 			
-			function animate() {
-
+			function animate() 
+			{
 				requestAnimationFrame( animate );
-
-				render();
+				render_demo();
 			}
 			
-			function render() {
+			function render() 
+			{
 
 				var time = Date.now() * 0.0005;
 				var vector3=new THREE.Vector3(Math.sin( time * 0.7 ) * 2000,Math.cos( time * 0.3 ) * 2000,Math.cos( time * 0.3 ) * 2000);
@@ -139,10 +114,22 @@
 					//scene.children[ i].scale.z=Math.random()*10;
 					scene.children[ i ].lookAt(vector3  );
 				}
-
-		
-
 				renderer.render( scene, camera );
 
 			}
 
+			function render_demo() 
+			{
+
+				var time = Date.now() * 0.0005;
+				var vector3=new THREE.Vector3(Math.sin( time * 0.7 ) * 2000,Math.cos( time * 0.3 ) * 2000,Math.cos( time * 0.3 ) * 2000);
+				for ( var i = 3; i < pointerArray[0]+3; i ++ ) {
+
+					//1是camera 2是grid 3才是Pointer 注意看前面的scene.add
+					//scene.children[ 3].rotateOnAxis(pointerArray[i-2],Math.random()*0.01);
+					//scene.children[ i].scale.z=Math.random()*10;
+					scene.children[ i ].lookAt(vector3  );
+				}
+				renderer.render( scene, camera );
+
+			}

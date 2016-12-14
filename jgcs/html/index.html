@@ -60,26 +60,45 @@
   		
   				var init_scene=function()
   				{
-  					alert("HI2");
   					$.post("/select_scenes",
   								{name:"table",col:"ID"},
 									function(data,status)
 											{
-													alert("数据: \n" + data + "\n状态: " + status);
+												if(status=="success")
+												{ 
+													var rowCount=data.rowCount;
+													for(var i=0;i<rowCount;i++)
+													{
+														var str1="No sensor!";
+														if(data.rows[i].SENSOR != null)
+														{
+															var  sensor=data.rows[i].SENSOR;
+															var sensor_cnt=sensor.sensors.length;
+															str1="";
+															for(var j=0;j<sensor_cnt;j++)
+															{
+																str1=str1+"   编号:"+sensor.sensors[j].id+" 放置角度："+sensor.sensors[j].angle;
+															}
+														}
+														var str2="<option value='"+data.rows[i].ID+"'> 场景"+data.rows[i].ID+": "+data.rows[i].NAME+"  描述："+data.rows[i].DESC+"  传感器分布："+str1+"</option>";
+														$("#select_scene").append(str2); //为Select追加一个Option(下拉项) 
+  													//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
+													}
+												}
+												else
+													alert("select_scenes failed");
 											}
 						);
-  					$("#select_scene").append("<option value='Value'>自动加载场景1</option>"); //为Select追加一个Option(下拉项) 
-  					$("#select_scene").append("<option value='Value'>自动加载场景2</option>"); //为Select追加一个Option(下拉项)
-  					$("#select_scene").append("<option value='Value'>自动加载场景3</option>"); //为Select追加一个Option(下拉项)
-  					//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
-  				}();
+   				}();
   					
 					$("#select_scene").change(function(){
 					
-					var checkText=$("#select_scene").find("option:selected").text(); //获取Select选择的Text 
-					alert("checkText:"+checkText);
-					var checkValue=$("#select_scene").val(); //获取Select选择的Value 
-					alert("checkValue:"+checkValue);
+						var checkText=$("#select_scene").find("option:selected").text(); //获取Select选择的Text 
+						alert("checkText:"+checkText);
+						var checkValue=$("#select_scene").val(); //获取Select选择的Value 
+						alert("checkValue:"+checkValue);
+						
+						
 					
 					}); //为Select添加选择事件 
 			});
