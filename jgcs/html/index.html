@@ -11,7 +11,7 @@
 
 	<!--  BOOTSTRAP -->
 	<link href="../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
-	<script src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
 
   <!--  JQUERY-UI (only sortable and datepicker is needed) -->
 	<link rel="stylesheet" type="text/css" href="../jquery-ui-1.12.1/jquery-ui.min.css">
@@ -39,7 +39,23 @@
 	<link rel="stylesheet" type="text/css" href="../bs_grid/jquery.bs_grid.min.css">
 	<script type="text/javascript" src="../bs_grid/jquery.bs_grid.min.js"></script>
 	<script type="text/javascript" src="../bs_grid/localization/en.js"></script>
+	
+	<!--  DATATABLE plugin -->
+	<link rel="stylesheet" type="text/css" href="../datatable/css/dataTables.bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../datatable/css/buttons.bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../datatable/css/select.bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../datatable/css/editor.bootstrap.min.css">
+	
+	<script type="text/javascript" src="../datatable/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="../datatable/js/dataTables.bootstrap.min.js"></script>
+	<script type="text/javascript" src="../datatable/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="../datatable/js/buttons.bootstrap.min.js"></script>	
+	<script type="text/javascript" src="../datatable/js/dataTables.select.min.js"></script>
 
+	<script type="text/javascript" src="../datatable/js/dataTables.editor.min.js"></script>
+	<script type="text/javascript" src="../datatable/js/editor.bootstrap.min.js"></script>
+
+	
 	<!--  three.js -->
 	<script src="../three/js/build/three.js"></script>
 	<script src="../three/js/Detector.js"></script>
@@ -58,6 +74,8 @@
 		var gSceneList=new Array();//gSensorVector inside
 		var gSensorVector =new Array();//the current sensor posision,THREE.Vector3 inside
 		var gRadius=6; //
+		
+		var editor; // use a global for the submit and return data rendering in the examples
 		//全局函数
 		function ss3dzs()
 		{
@@ -76,7 +94,7 @@
 		//++++++++++++++  init +++++++++++++++++++++++++++
 		//在没有选择场景之前，展示demo
 		var vector=new Array();
-		gSensorNum=8
+		gSensorNum=8;//  
 		for(var j=0;j<gSensorNum;j++)
 		{
 				vector[j]=new THREE.Vector3(gRadius*Math.cos((2*Math.PI/gSensorNum)*j),gRadius*Math.sin((2*Math.PI/gSensorNum)*j),0);
@@ -96,7 +114,7 @@
 								{
 									var str1="No sensor!";
 									var sensorVector=[];
-									if(data.rows[i].SENSOR != null)
+									if(data.rows[i].SENSOR != null)//SENSOR is object
 									{
 										var  sensor=data.rows[i].SENSOR;
 										var sensor_num=sensor.sensors.length;
@@ -105,7 +123,6 @@
 										for(var j=0;j<sensor_num;j++)
 										{
 											str1=str1+"   编号:"+sensor.sensors[j].id+" 放置角度："+sensor.sensors[j].angle;
-											
 											//get posision of sensor
 											var angle=((sensor.sensors[j].angle)/360)*2*Math.PI;//;
 											var vector=new THREE.Vector3(gRadius*Math.cos(i*angle),gRadius*Math.sin(i*angle),0);
@@ -125,15 +142,14 @@
 				);
 		//+++++++++++++++++++++++++++++++++++++++++
 	</script>
-	
-	
-	
+		
 	<script>
   	$(function() {
     	$( "#tabs" ).tabs();
   	});
   </script>	
   <script>
+  	//处理场景选择
   	$(function() {
   		
  					
@@ -144,99 +160,88 @@
 						//var checkValue=$("#select_scene").val(); //获取Select选择的Value 
 						//alert("checkValue:"+checkValue);
 						gSceneID=$("#select_scene").val()
-						alert("gSceneID:"+gSceneID);
+						//alert("gSceneID:"+gSceneID);
 						gSensorVector=gSceneList[gSceneID];
             gSensorNum=gSensorVector.length;
 						$("#3dzs_canvas").empty(); 
 						ss3dzs()
 					}); //为Select添加选择事件 
 			});
-				</script>
-  <script>
-	  $(function() {
-
-			$("#cjwh_grid").bs_grid({
-
-	        //ajaxFetchDataURL: "ajax_fetch_page_data.php",
-	        row_primary_key: "customer_id",
-					//bootstrap_version: "3",
-	        columns: [
-	            {field: "customer_id", header: "Code", visible: "no"},
-	            {field: "lastname", header: "Lastname"},
-	            {field: "firstname", header: "Firstname"},
-	            {field: "email", header: "Email", visible: "no", "sortable": "no"},
-	            {field: "gender", header: "Gender"},
-	            {field: "date_updated", header: "Date updated"}
-	        ],
-
-	        sorting: [
-	            {sortingName: "Code", field: "customer_id", order: "none"},
-	            {sortingName: "Lastname", field: "lastname", order: "ascending"},
-	            {sortingName: "Firstname", field: "firstname", order: "ascending"},
-	            {sortingName: "Date updated", field: "date_updated", order: "none"}
-	        ],
-
-	        filterOptions: {
-	            filters: [
-	                {
-	                    filterName: "Lastname", "filterType": "text", field: "lastname", filterLabel: "Last name",
-	                    excluded_operators: ["in", "not_in"],
-	                    filter_interface: [
-	                        {
-	                            filter_element: "input",
-	                            filter_element_attributes: {"type": "text"}
-	                        }
-	                    ]
-	                },
-	                {
-	                    filterName: "Gender", "filterType": "number", "numberType": "integer", field: "lk_genders_id", filterLabel: "Gender",
-	                    excluded_operators: ["equal", "not_equal", "less", "less_or_equal", "greater", "greater_or_equal"],
-	                    filter_interface: [
-	                        {
-	                            filter_element: "input",
-	                            filter_element_attributes: {type: "checkbox"}
-	                        }
-	                    ],
-	                    lookup_values: [
-	                        {lk_option: "Male", lk_value: "1"},
-	                        {lk_option: "Female", lk_value: "2", lk_selected: "yes"}
-	                    ]
-	                },
-	                {
-	                    filterName: "DateUpdated", "filterType": "date", field: "date_updated", filterLabel: "Datetime updated",
-	                    excluded_operators: ["in", "not_in"],
-	                    filter_interface: [
-	                        {
-	                            filter_element: "input",
-	                            filter_element_attributes: {
-	                                type: "text",
-	                                title: "Set the date and time using format: dd/mm/yyyy hh:mm:ss"
-	                            },
-	                            filter_widget: "datetimepicker",
-	                            filter_widget_properties: {
-	                                dateFormat: "dd/mm/yy",
-	                                timeFormat: "HH:mm:ss",
-	                                changeMonth: true,
-	                                changeYear: true,
-	                                showSecond: true
-	                            }
-	                        }
-	                    ],
-	                    validate_dateformat: ["DD/MM/YYYY HH:mm:ss"],
-	                    filter_value_conversion: {
-	                        function_name: "local_datetime_to_UTC_timestamp",
-	                        args: [
-	                            {"filter_value": "yes"},
-	                            {"value": "DD/MM/YYYY HH:mm:ss"}
-	                        ]
-	                    }
-	                }
-	            ]
-	        }
-	    });
-		});
 	</script>
-	  	
+  
+  <script>
+  
+		$(function() {
+		    editor = new $.fn.dataTable.Editor( {
+		        ajax: "",
+		        table: "#scene_table",
+		        idSrc:  'ID',
+		        fields: [  {
+		                label: "场景名称:",
+		                name: "NAME"
+		            }, {
+		                label: "场景描述:",
+		                name: "DESC"
+		            }, {
+		                label: "传感器:",
+		                name: "SENSOR"
+		            }, {
+		                label: "创建时间:",
+		                name: "CREATE_TIME"
+		            }
+		        ]
+		    } );
+		    
+		   	    
+		    var table = $('#scene_table').DataTable( {
+		      ajax:"/select_scenes_d",
+		       columns: [
+		       	{ data: "ID" },
+		       	{ data: "NAME" },
+		       	{ data: "DESC" },
+		      	{ data: "SENSOR" },
+		        { data: "CREATE_TIME" }
+		        ],
+		        order: [ 1, 'asc' ],
+        		select: true
+		    } );
+		 
+		    // Display the buttons
+		    //new $.fn.dataTable.Buttons( table, [
+		    //    { extend: "create", editor: editor },
+		       // { extend: "edit",   editor: editor },
+		     //   { extend: "remove", editor: editor }
+		    //] );
+		 
+		    table.buttons().container()
+		        .appendTo( $('.col-sm-6:eq(0)', table.table().container() ) );
+		        
+		      
+		      $('#scene_table tbody').on( 'click', 'tr', function () {
+		        if ( $(this).hasClass('selected') ) {
+		            $(this).removeClass('selected');
+		        }
+		        else {
+		            table.$('tr.selected').removeClass('selected');
+		            $(this).addClass('selected');
+		        }
+		    	} ); 
+		        		
+    		 $('#scene_table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+        		editor.inline( this);
+    			} );
+    			
+    		 $('#delRow').click( function () {
+    		 		if(confirm("是否删除?"))		table.row('.selected').remove().draw( false );
+    			} );
+    			
+    		 $('#addRow').click( function () {
+        		 
+    			} );
+    
+		} );
+	</script>	  	
+	
 </head>
 <body>
 	
@@ -274,27 +279,33 @@
 				</div>
 			</div>
 			
-			<div class="tab-pane fade in active" id="3dhzs">
+			<div class="tab-pane fade " id="3dhzs">
 			 <p>3d历史 </p>
 			</div>
 	   
 	   	<div class="tab-pane fade" id="cjwh">
-	      <p>场景维护 </p>
-	   		  
-	      <div id="cjwh_grid" title="hello">
-	      	
-					
-	      </div>
-	
-	      
+		    <table id="scene_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+	        <thead>
+	            <tr>
+	                <th>场景编号</th>
+	                <th>场景名称</th>
+	                <th>场景描述</th>
+	                <th>传感器  </th>
+	                <th>创建时间</th>
+	            </tr>
+	        </thead>
+
+	         <tbody></tbody>
+	         
+	    	</table>  
+	    	<p>
+				  <button id="addRow" type="button" class="btn btn-info bt-sm">新增</button>
+					<button id="delRow" type="button" class="btn btn-danger bt-sm">删除</button>
+				</p>
 	   	</div>
 	   
 	    <div class="tab-pane fade" id="glcj">
-	      <p>关联场景</p>
-	        <div id="glcj_grid">
-	      	
-					
-	      </div>
+
 	   	</div>
 	  
 		</div>

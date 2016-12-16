@@ -34,6 +34,15 @@ function route(client,handle,pathname,response){
 		         		case "js":
 		         			response.writeHead(200, {'Content-Type': 'application/x-javascript'});
 		         			break;
+		         		case "ttf":
+		         			response.writeHead(200, {'Content-Type': 'font/truetype'});
+		         			break;
+		         		case "woff":
+		         			response.writeHead(200, {'Content-Type': 'application/x-font-woff'});
+		         			break;
+		         		case "woff2":
+		         			response.writeHead(200, {'Content-Type': 'application/x-font-woff'});
+		         			break;
 		         		default:
 		         		response.writeHead(200, {'Content-Type': 'text/plain'});	
 		         		
