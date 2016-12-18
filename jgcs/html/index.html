@@ -65,8 +65,23 @@
 	<script src="../three/js/loaders/OBJLoader.js"></script>
 	<!--  3dzs -->
 	<script src="../lee_js/3Dzs.js"></script>
+	<!--  websocket -->
+	<script src="../node_modules/socket.io-client/dist/socket.io.min.js"></script>
+
+	<script src="../websocket_client.js"></script>
+	<!--------->
+	</style>
+	<style> 
+		.tab_div{ position:relative;width:1200px;height:600px;	border:1px solid #000} 
+		.canvas_div{ position:relative;width:1155px;height:500px} 
+		.wsDiv{ position:absolute;width:350px;height:500px; top:200px;left:1210px;background:#fff} 
+</style> 
+	
 	
 	<script>
+		if (!window.WebSocket) { 
+			alert("该浏览器不支持WebSocket，系统将不能正常工作！"); 
+    }
 		//全局变量
 		var gSceneNum=0;//scene number
 		var gSensorNum=0;//sensor number   
@@ -250,7 +265,8 @@
 			<small style="font-family:'微软雅黑';">    井盖磁场测试系统</small> 
 		</h1>
 	</div>
-	<div id=tabs >
+
+	<div class="tab_div" id=tabs >
 		<ul id="tab0">
 	   	<li class="active">  <a href="#3dzs" data-toggle="tab"> 3D实时展示 </a>  	</li>
 	   	<li><a href="#3dhzs"  data-toggle="tab">3D历史展示</a></li>
@@ -270,7 +286,7 @@
 	  		</form>
 	  		
 	  		
-	  		<div id="3dzs_canvas" >
+	  		<div calss=canvas_div id="3dzs_canvas"  >
 	  			
 					<script>
 						ss3dzs()
@@ -305,10 +321,20 @@
 	   	</div>
 	   
 	    <div class="tab-pane fade" id="glcj">
-
+				
 	   	</div>
 	  
 		</div>
 	</div>
+		 <div class="wsDiv" >
+			<ul id="messages"></ul>
+ 			<form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    	</form>
+		 	<script>
+			</script>
+		 	
+		 	
+		 </div>
 </body>
 </html>

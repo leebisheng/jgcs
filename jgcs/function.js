@@ -1,7 +1,7 @@
-﻿function select_scenes(client,response)
+﻿function select_scenes(DBclient,response)
 {
      //执行相应的sql语句
-    client.query("select * from b_conf_scenes;",function(error,results)
+    DBclient.query("select * from b_conf_scenes;",function(error,results)
     {
         console.log("in callback function.\n");
         if (error)
@@ -25,12 +25,12 @@
  		});
 }
 
-function select_scenes_d(client,response)
+function select_scenes_d(DBclient,response)
 {
      //执行相应的sql语句
-    client.query("select * from b_conf_scenes;",function(error,results)
+    DBclient.query("select * from b_conf_scenes;",function(error,results)
     {
-        console.log("in callback function.\n");
+
         if (error)
         {
             console.log("error");

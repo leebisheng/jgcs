@@ -7,8 +7,8 @@
 			
 			function init(pointer_cnt,vector) 
 			{
-				width = 1600;//document.getElementById('3dzs_canvas').clientWidth;//获取画布「canvas3d」的宽
-   			height =600;//document.getElementById('3dzs_canvas').clientHeight;//获取画布「canvas3d」的高
+				width = 1155//document.getElementById('3dzs_canvas').clientWidth;//获取画布「canvas3d」的宽
+   			height =500;//document.getElementById('3dzs_canvas').clientHeight;//获取画布「canvas3d」的高
    			
    		
 				renderer = new THREE.WebGLRenderer( { antialias: true } );//生成渲染器对象（属性：抗锯齿效果为设置有效）

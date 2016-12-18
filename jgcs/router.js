@@ -1,5 +1,14 @@
-﻿var fs = require('fs');
-function route(client,handle,pathname,response){
+﻿
+function http_do(){
+	
+		// 解析请求，包括文件名
+	   var pathname = url.parse(request.url).pathname;
+	  
+	   if (pathname.length==1) pathname="/index.html"; //可以不用输入路径，但是默认用index.html
+	  	
+	   // 输出请求的文件名
+	   console.log("Request for " + pathname + " received.");
+		   
 		
     if(typeof handle[pathname] === 'function')
     {
@@ -58,4 +67,4 @@ function route(client,handle,pathname,response){
     }
 }
 
-exports.route = route;
+exports.http_do = http_do;

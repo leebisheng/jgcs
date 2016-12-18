@@ -1,11 +1,6 @@
-﻿var mosca = require('mosca');
-var mqtt_port=1883;
-function start_mqtt(db_client)
+﻿function mqtt_do(MqttServer,DBclient,io)
 {
-	var MqttServer = new mosca.Server({
-	    port: mqtt_port
-	});
-	
+
 	MqttServer.on('clientConnected', function(client){
     console.log('client connected', client.id);
 	});
@@ -13,13 +8,20 @@ function start_mqtt(db_client)
 	MqttServer.on('published', function(packet, client) {
     var topic = packet.topic;
     console.log('message-arrived--->','topic ='+topic+',message = '+ packet.payload.toString());
+    if(topic.substr(0,1)!='$')
+    {
+    	var str='topic ='+topic+',message = '+ packet.payload.toString();
+    	console.log(str);
+    	io.emit('mqtt_message',str );
+    }
+    
 	});
 
 	MqttServer.on('ready', function(){
-    console.log('mqtt is running at 127.0.0.1:'+mqtt_port);
+    console.log('mqtt is running ......');
 	    //MqttServer.authenticate = authenticate;
 	});
 	
 }
 
-exports.start_mqtt = start_mqtt;
+exports.mqtt_do = mqtt_do;
