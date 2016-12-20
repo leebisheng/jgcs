@@ -25,7 +25,6 @@ var ws=require("./websocket");
 var MqttServer = new mosca.Server({
 	    port: mqtt_port
 	});
-	
 
 //配置网页文件目录
 app.set('views','./html');

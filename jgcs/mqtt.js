@@ -7,12 +7,26 @@
 
 	MqttServer.on('published', function(packet, client) {
     var topic = packet.topic;
-    console.log('message-arrived--->','topic ='+topic+',message = '+ packet.payload.toString());
+    var strMes='-->topic ='+topic+' message = '+ packet.payload.toString()
+    console.log(strMes);
     if(topic.substr(0,1)!='$')
     {
-    	var str='topic ='+topic+',message = '+ packet.payload.toString();
-    	console.log(str);
-    	io.emit('mqtt_message',str );
+    	if(topic.indexOf('magnetic')>-1)
+    	{
+    		var jsonMes=JSON.parse(packet.payload.toString());
+    		jsonMes["topic"]=topic;
+    		io.emit('topic_json',JSON.stringify(jsonMes) );
+    		console.log("topic_json  -->");
+    		
+    	}
+    	else{
+    		io.emit('mqtt_message',strMes);
+    	}
+    	
+    }
+    else
+    {
+    		
     }
     
 	});

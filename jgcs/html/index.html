@@ -17,43 +17,6 @@
 	<link rel="stylesheet" type="text/css" href="../jquery-ui-1.12.1/jquery-ui.min.css">
 	<script type="text/javascript" src="../jquery-ui-1.12.1/jquery-ui.min.js"></script>
 	
-	<!--  if timepicker is used in filters -->
-	<link rel="stylesheet" type="text/css" href="../timepicker/jquery-ui-timepicker-addon.min.css"/>
-	<script type="text/javascript" src="../timepicker/jquery-ui-timepicker-addon.min.js"></script>
-	<!--  if touch event support is needed (mobile devices) -->
-	<script type="text/javascript" src="../timepicker/jquery.ui.touch-punch.min.js"></script>
- 
-	<!--  PAGINATION plugin -->
-	<link rel="stylesheet" type="text/css" href="../bs_pagination/jquery.bs_pagination.min.css">
-	<script type="text/javascript" src="../bs_pagination/jquery.bs_pagination.min.js"></script>
-	<script type="text/javascript" src="../bs_pagination/localization/en.min.js"></script>
-
-	<!--  FILTERS plugin --> 
-	<link rel="stylesheet" type="text/css" href="../jui_filter_rules/jquery.jui_filter_rules.bs.min.css">
-	<script type="text/javascript" src="../jui_filter_rules/jquery.jui_filter_rules.min.js"></script>
-	<script type="text/javascript" src="../jui_filter_rules/localization/en.min.js"></script>
-	<!--  required from filters plugin -->
-	<script type="text/javascript" src="../moment/moment.min.js"></script>
-
-	<!--  DATAGRID plugin -->
-	<link rel="stylesheet" type="text/css" href="../bs_grid/jquery.bs_grid.min.css">
-	<script type="text/javascript" src="../bs_grid/jquery.bs_grid.min.js"></script>
-	<script type="text/javascript" src="../bs_grid/localization/en.js"></script>
-	
-	<!--  DATATABLE plugin -->
-	<link rel="stylesheet" type="text/css" href="../datatable/css/dataTables.bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="../datatable/css/buttons.bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="../datatable/css/select.bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="../datatable/css/editor.bootstrap.min.css">
-	
-	<script type="text/javascript" src="../datatable/js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" src="../datatable/js/dataTables.bootstrap.min.js"></script>
-	<script type="text/javascript" src="../datatable/js/dataTables.buttons.min.js"></script>
-	<script type="text/javascript" src="../datatable/js/buttons.bootstrap.min.js"></script>	
-	<script type="text/javascript" src="../datatable/js/dataTables.select.min.js"></script>
-
-	<script type="text/javascript" src="../datatable/js/dataTables.editor.min.js"></script>
-	<script type="text/javascript" src="../datatable/js/editor.bootstrap.min.js"></script>
 
 	
 	<!--  three.js -->
@@ -67,14 +30,25 @@
 	<script src="../lee_js/3Dzs.js"></script>
 	<!--  websocket -->
 	<script src="../node_modules/socket.io-client/dist/socket.io.min.js"></script>
-
+	<script>
+	//建立websocket连接
+	var socket = io();
+	</script>
 	<script src="../websocket_client.js"></script>
-	<!--------->
-	</style>
+
+
 	<style> 
 		.tab_div{ position:relative;width:1200px;height:600px;	border:1px solid #000} 
 		.canvas_div{ position:relative;width:1155px;height:500px} 
-		.wsDiv{ position:absolute;width:350px;height:500px; top:200px;left:1210px;background:#fff} 
+		.wsDiv{ position:absolute;width:350px;height:600px; top:0px;left:1210px;background:#E5E5E5} 
+		#info {
+				color:#FFF;
+				position: absolute;
+				top: 100px; left: 600px;
+				padding: 5px;
+
+			}
+		
 </style> 
 	
 	
@@ -82,40 +56,76 @@
 		if (!window.WebSocket) { 
 			alert("该浏览器不支持WebSocket，系统将不能正常工作！"); 
     }
-		//全局变量
-		var gSceneNum=0;//scene number
-		var gSensorNum=0;//sensor number   
-		var gSceneID=0;//the current scene
-		var gSceneList=new Array();//gSensorVector inside
-		var gSensorVector =new Array();//the current sensor posision,THREE.Vector3 inside
+    /* 传感器数据结构  主题，3D坐标位置，实际的磁场数据
+		var sJsonSensor={
+			'topic':'',
+			'position_3':'',  
+			'position_r':''
+			};
+			
+		var sSensorVector =new Array();//传感器数组 里面放sJsonSensor
+		*/
+		var gSceneList=new Array();//所有场景数据列表，里面放sSensorVector 
+		var gSceneID=0;//当前场景编号，0是“请选择” ，实际场景从1开始
+
 		var gRadius=6; //
 		
 		var editor; // use a global for the submit and return data rendering in the examples
-		//全局函数
+		
 		function ss3dzs()
-		{
-			
-						init(gSensorNum,gSensorVector);
+		{				
+						var sensor_num=0;
+						var vectors=[];
+
 						if(gSceneID==0)//demo mode
 						{
-							animate(true);
+							//在没有选择场景之前，展示demo
+						
+							sensor_num=8;//  
+							for(var i=0;i<sensor_num;i++)
+							{
+									vectors[i]=new THREE.Vector3(gRadius*Math.cos((2*Math.PI/sensor_num)*i),gRadius*Math.sin((2*Math.PI/sensor_num)*i),0);
+							}
 						}
 						else 
 						{
-							animate(false);
+							sensor_num=gSceneList[gSceneID-1].length;
+
+							for(var i=0;i<sensor_num;i++)
+							{
+								vectors[i]=gSceneList[gSceneID-1][i].position_3;
+							}
+									
 						}
-						
+						init(sensor_num,vectors);
+						animate();
 		}
-		//++++++++++++++  init +++++++++++++++++++++++++++
-		//在没有选择场景之前，展示demo
-		var vector=new Array();
-		gSensorNum=8;//  
-		for(var j=0;j<gSensorNum;j++)
+		function UpdateSensorData(jsonMes)
 		{
-				vector[j]=new THREE.Vector3(gRadius*Math.cos((2*Math.PI/gSensorNum)*j),gRadius*Math.sin((2*Math.PI/gSensorNum)*j),0);
+			var topic=jsonMes.topic;
+			var vector=new THREE.Vector3(	jsonMes.mag_x,jsonMes.mag_y,jsonMes.mag_z);
+			var sensor_num=gSceneList[gSceneID-1].length;
+			var vectors=[];
+			var b=0;
+			for(var i=0;i<sensor_num;i++)//
+			{
+					if(topic==gSceneList[gSceneID-1][i].topic)
+					{
+							gSceneList[gSceneID-1][i].position_r=vector;
+							b=1;
+							break;
+					}
+			}
+			if (b==0)
+			{
+				 $('#messages').append($('<li>').text("收到场景中未定义的传感器主题"+topic));
+			}
 		}
-		gSensorVector=vector;
-		gSceneList[0]=vector;
+		
+
+
+		//++++++++++++++  init +++++++++++++++++++++++++++
+		
 
 		//get scene
 		$.post("/select_scenes",
@@ -124,29 +134,48 @@
 						{
 							if(status=="success")
 							{ 
-								gSceneNum=data.rowCount;
-								for(var i=0;i<gSceneNum;i++)
+								var SceneNum=data.rowCount;
+								for(var i=0;i<SceneNum;i++)  //SceneNum
 								{
 									var str1="No sensor!";
-									var sensorVector=[];
-									if(data.rows[i].SENSOR != null)//SENSOR is object
+									
+									if(data.rows[i].SENSOR != null)
 									{
-										var  sensor=data.rows[i].SENSOR;
-										var sensor_num=sensor.sensors.length;
+										var sensor_obj=data.rows[i].SENSOR;//SENSOR is object
+										var sensor_num=sensor_obj.sensors.length;
 										
+										var sSensorVector =new Array();
+										
+
 										str1="";
-										for(var j=0;j<sensor_num;j++)
+										for(var j=0;j<sensor_num;j++) //sensor num
 										{
-											str1=str1+"   编号:"+sensor.sensors[j].id+" 放置角度："+sensor.sensors[j].angle;
+										
+											str1=str1+"   编号:"+sensor_obj.sensors[j].id+"   主题:"+sensor_obj.sensors[j].topic+"   放置角度："+sensor_obj.sensors[j].angle;
 											//get posision of sensor
-											var angle=((sensor.sensors[j].angle)/360)*2*Math.PI;//;
-											var vector=new THREE.Vector3(gRadius*Math.cos(i*angle),gRadius*Math.sin(i*angle),0);
-											sensorVector[j]=vector;
+											var angle=sensor_obj.sensors[j].angle*(2*Math.PI)/360;//;
+											var vector=new THREE.Vector3(gRadius*Math.cos(angle),gRadius*Math.sin(angle),0);
+											var sJsonSensor={
+											'topic':'',
+											'position_3':'',
+											'position_r':''
+											};
+											sJsonSensor.topic=sensor_obj.sensors[j].topic;											
+											sJsonSensor.position_3=vector;
 											
+											sSensorVector[j] =sJsonSensor;											
+	
 										}
+										gSceneList[i]=sSensorVector;//all scene list ,vector inside，
 									}
-									gSceneList[i+1]=sensorVector;
-									var str2="<option value='"+data.rows[i].ID+"'> 场景"+data.rows[i].ID+": "+data.rows[i].NAME+"  描述："+data.rows[i].DESC+"  传感器分布："+str1+"</option>";
+									else
+									{
+										alert("场景配置错误，缺传感器数据！");
+										return;
+									}
+									
+									
+									var str2="<option value='"+data.rows[i].ID+"'> 场景"+data.rows[i].ID+": "+data.rows[i].NAME+"  端口："+data.rows[i].PORT+"  传感器分布："+str1+"</option>";
 									$("#select_scene").append(str2); //为Select追加一个Option(下拉项) 
   								//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
 								}
@@ -170,92 +199,16 @@
  					
 					$("#select_scene").change(function(){
 					
-						//var checkText=$("#select_scene").find("option:selected").text(); //获取Select选择的Text 
-						//alert("checkText:"+checkText);
-						//var checkValue=$("#select_scene").val(); //获取Select选择的Value 
-						//alert("checkValue:"+checkValue);
-						gSceneID=$("#select_scene").val()
+						gSceneID=$("#select_scene").val();
 						//alert("gSceneID:"+gSceneID);
-						gSensorVector=gSceneList[gSceneID];
-            gSensorNum=gSensorVector.length;
 						$("#3dzs_canvas").empty(); 
-						ss3dzs()
+						ss3dzs();
+						
+						
 					}); //为Select添加选择事件 
 			});
 	</script>
-  
-  <script>
-  
-		$(function() {
-		    editor = new $.fn.dataTable.Editor( {
-		        ajax: "",
-		        table: "#scene_table",
-		        idSrc:  'ID',
-		        fields: [  {
-		                label: "场景名称:",
-		                name: "NAME"
-		            }, {
-		                label: "场景描述:",
-		                name: "DESC"
-		            }, {
-		                label: "传感器:",
-		                name: "SENSOR"
-		            }, {
-		                label: "创建时间:",
-		                name: "CREATE_TIME"
-		            }
-		        ]
-		    } );
-		    
-		   	    
-		    var table = $('#scene_table').DataTable( {
-		      ajax:"/select_scenes_d",
-		       columns: [
-		       	{ data: "ID" },
-		       	{ data: "NAME" },
-		       	{ data: "DESC" },
-		      	{ data: "SENSOR" },
-		        { data: "CREATE_TIME" }
-		        ],
-		        order: [ 1, 'asc' ],
-        		select: true
-		    } );
-		 
-		    // Display the buttons
-		    //new $.fn.dataTable.Buttons( table, [
-		    //    { extend: "create", editor: editor },
-		       // { extend: "edit",   editor: editor },
-		     //   { extend: "remove", editor: editor }
-		    //] );
-		 
-		    table.buttons().container()
-		        .appendTo( $('.col-sm-6:eq(0)', table.table().container() ) );
-		        
-		      
-		      $('#scene_table tbody').on( 'click', 'tr', function () {
-		        if ( $(this).hasClass('selected') ) {
-		            $(this).removeClass('selected');
-		        }
-		        else {
-		            table.$('tr.selected').removeClass('selected');
-		            $(this).addClass('selected');
-		        }
-		    	} ); 
-		        		
-    		 $('#scene_table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-        		editor.inline( this);
-    			} );
-    			
-    		 $('#delRow').click( function () {
-    		 		if(confirm("是否删除?"))		table.row('.selected').remove().draw( false );
-    			} );
-    			
-    		 $('#addRow').click( function () {
-        		 
-    			} );
-    
-		} );
-	</script>	  	
+
 	
 </head>
 <body>
@@ -268,10 +221,12 @@
 
 	<div class="tab_div" id=tabs >
 		<ul id="tab0">
-	   	<li class="active">  <a href="#3dzs" data-toggle="tab"> 3D实时展示 </a>  	</li>
+	   	<li class="active">  <a href="#3dzs" data-toggle="tab"> 3D实时展示 </a>  	</li>     
+	   	<!--
 	   	<li><a href="#3dhzs"  data-toggle="tab">3D历史展示</a></li>
 	   	<li><a href="#cjwh" data-toggle="tab">场景维护</a></li>
 	   	<li><a href="#glcj"  data-toggle="tab">关联场景</a></li>
+	   	 -->
 		</ul>
 
 		<div id="myTabContent" class="tab-content">
@@ -287,50 +242,23 @@
 	  		
 	  		
 	  		<div calss=canvas_div id="3dzs_canvas"  >
-	  			
+	  			<div id="info" text-align:center>
+						<a href="http://www.creallies.com/" target="_blank">酷联科技</a> - 磁场展示<br />
+						</div>
 					<script>
-						ss3dzs()
+						ss3dzs();
 					
 					</script>
 				</div>
 			</div>
 			
-			<div class="tab-pane fade " id="3dhzs">
-			 <p>3d历史 </p>
-			</div>
-	   
-	   	<div class="tab-pane fade" id="cjwh">
-		    <table id="scene_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
-	        <thead>
-	            <tr>
-	                <th>场景编号</th>
-	                <th>场景名称</th>
-	                <th>场景描述</th>
-	                <th>传感器  </th>
-	                <th>创建时间</th>
-	            </tr>
-	        </thead>
-
-	         <tbody></tbody>
-	         
-	    	</table>  
-	    	<p>
-				  <button id="addRow" type="button" class="btn btn-info bt-sm">新增</button>
-					<button id="delRow" type="button" class="btn btn-danger bt-sm">删除</button>
-				</p>
-	   	</div>
-	   
-	    <div class="tab-pane fade" id="glcj">
-				
-	   	</div>
-	  
-		</div>
 	</div>
 		 <div class="wsDiv" >
-			<ul id="messages"></ul>
- 			<form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    	</form>
+		
+ 			<form action="">    
+ 				<input id="m" autocomplete="off" style="width:300px;height:35px;"><button>Send</button>
+    	</form>   
+    		<ul id="messages" style="width:350px;height:550px;overflow:auto;"></ul>
 		 	<script>
 			</script>
 		 	

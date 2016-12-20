@@ -11,6 +11,11 @@
   	socket.on('disconnect', function(){
     	console.log('a socket client  disconnected');
   	});
+  	
+  	socket.on('SubTopic', function(msg){
+    	console.log("Received  SubTopic:"+msg);
+    	
+  	});
 	});
 	
 

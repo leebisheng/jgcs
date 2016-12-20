@@ -47,7 +47,6 @@
 				geometry.rotateX( Math.PI / 2 );
 
 				var material = new THREE.MeshNormalMaterial();
-				pointerArray[0]=pointer_cnt;
 				
 				for ( var i = 0; i < pointer_cnt; i ++ ) {
 
@@ -61,6 +60,7 @@
 					pointerArray[i+1]=vector;
 
 				}
+				pointerArray[0]=pointer_cnt;
 				///-----
 				
 				var controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -91,41 +91,36 @@
 
 			}
 			
-			function animate(demo) 
+			function animate() 
 			{
 				requestAnimationFrame( animate );
-				if(demo)render_demo();
-				else render
+				render();
 			}
 			
 			function render() 
 			{
-
 				var time = Date.now() * 0.0005;
-				var vector3=new THREE.Vector3(Math.sin( time * 0.7 ) * 2000,Math.cos( time * 0.3 ) * 2000,Math.cos( time * 0.3 ) * 2000);
-				for ( var i = 3; i < pointerArray[0]+3; i ++ ) {
+				var vector_fee=new THREE.Vector3(Math.sin( time * 0.7 ) * 2000,Math.cos( time * 0.3 ) * 2000,Math.cos( time * 0.3 ) * 2000);
+				var sensor_num=pointerArray[0];
+				var base=3;
+				for ( var i = 0; i < sensor_num; i ++ ) 
+				{
 
 					//1是camera 2是grid 3才是Pointer 注意看前面的scene.add
-					//scene.children[ 3].rotateOnAxis(pointerArray[i-2],Math.random()*0.01);
-					//scene.children[ i].scale.z=Math.random()*10;
-					//cene.children[ i ].lookAt(vector3  );
+					if(gSceneID!=0)
+					{
+
+								var vector_0=gSceneList[gSceneID-1][i].position_3;
+								var vector_1=gSceneList[gSceneID-1][i].position_r;
+								var vector_2=new THREE.Vector3(vector_0.x+vector_1.x,vector_0.y+vector_1.y,vector_0.z+vector_1.z); 
+
+					}
+		
+					else	{vector_2=vector_fee;}
+					scene.children[ i+base ].lookAt(vector_2  );
 				}
 				renderer.render( scene, camera );
 
 			}
 
-			function render_demo() 
-			{
-
-				var time = Date.now() * 0.0005;
-				var vector3=new THREE.Vector3(Math.sin( time * 0.7 ) * 2000,Math.cos( time * 0.3 ) * 2000,Math.cos( time * 0.3 ) * 2000);
-				for ( var i = 3; i < pointerArray[0]+3; i ++ ) {
-
-					//1是camera 2是grid 3才是Pointer 注意看前面的scene.add
-					//scene.children[ 3].rotateOnAxis(pointerArray[i-2],Math.random()*0.01);
-					//scene.children[ i].scale.z=Math.random()*10;
-					scene.children[ i ].lookAt(vector3  );
-				}
-				renderer.render( scene, camera );
-
-			}
+			
