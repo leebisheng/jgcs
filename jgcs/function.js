@@ -1,7 +1,7 @@
 ﻿function select_scenes(DBclient,response)
 {
      //执行相应的sql语句
-    DBclient.query("select * from b_conf_scenes;",function(error,results)
+    DBclient.query('select * from b_conf_scenes order by "id";',function(error,results)
     {
         console.log("in callback function.\n");
         if (error)
@@ -28,7 +28,7 @@
 function select_scenes_d(DBclient,response)
 {
      //执行相应的sql语句
-    DBclient.query("select * from b_conf_scenes;",function(error,results)
+    DBclient.query('select * from b_conf_scenes order by "id";',function(error,results)
     {
 
         if (error)

@@ -26,8 +26,11 @@
 	<script src="../three/js/loaders/DDSLoader.js"></script>
 	<script src="../three/js/loaders/MTLLoader.js"></script>
 	<script src="../three/js/loaders/OBJLoader.js"></script>
+	<script src="../three/js/libs/tween.min.js"></script>
+
 	<!--  3dzs -->
 	<script src="../lee_js/3Dzs.js"></script>
+	
 	<!--  websocket -->
 	<script src="../node_modules/socket.io-client/dist/socket.io.min.js"></script>
 	<script>
@@ -57,15 +60,15 @@
 			alert("该浏览器不支持WebSocket，系统将不能正常工作！"); 
     }
     /* 传感器数据结构  主题，3D坐标位置，实际的磁场数据
-		var sJsonSensor={
+		var sJsonsensor={
 			'topic':'',
 			'position_3':'',  
 			'position_r':''
 			};
 			
-		var sSensorVector =new Array();//传感器数组 里面放sJsonSensor
+		var ssensorVector =new Array();//传感器数组 里面放sJsonsensor
 		*/
-		var gSceneList=new Array();//所有场景数据列表，里面放sSensorVector 
+		var gSceneList=new Array();//所有场景数据列表，里面放ssensorVector 
 		var gSceneID=0;//当前场景编号，0是“请选择” ，实际场景从1开始
 
 		var gRadius=6; //
@@ -102,8 +105,9 @@
 		}
 		function UpdateSensorData(jsonMes)
 		{
+			if(gSceneID==0)return;
 			var topic=jsonMes.topic;
-			var vector=new THREE.Vector3(	jsonMes.mag_x,jsonMes.mag_y,jsonMes.mag_z);
+			var vector=new THREE.Vector3(	jsonMes["mag-x"],jsonMes["mag-y"],jsonMes["mag-z"]);
 			var sensor_num=gSceneList[gSceneID-1].length;
 			var vectors=[];
 			var b=0;
@@ -139,12 +143,12 @@
 								{
 									var str1="No sensor!";
 									
-									if(data.rows[i].SENSOR != null)
+									if(data.rows[i].sensor != null)
 									{
-										var sensor_obj=data.rows[i].SENSOR;//SENSOR is object
+										var sensor_obj=data.rows[i].sensor;//sensor is object
 										var sensor_num=sensor_obj.sensors.length;
 										
-										var sSensorVector =new Array();
+										var ssensorVector =new Array();
 										
 
 										str1="";
@@ -155,18 +159,18 @@
 											//get posision of sensor
 											var angle=sensor_obj.sensors[j].angle*(2*Math.PI)/360;//;
 											var vector=new THREE.Vector3(gRadius*Math.cos(angle),gRadius*Math.sin(angle),0);
-											var sJsonSensor={
+											var sJsonsensor={
 											'topic':'',
 											'position_3':'',
 											'position_r':''
 											};
-											sJsonSensor.topic=sensor_obj.sensors[j].topic;											
-											sJsonSensor.position_3=vector;
+											sJsonsensor.topic=sensor_obj.sensors[j].topic;											
+											sJsonsensor.position_3=vector;
 											
-											sSensorVector[j] =sJsonSensor;											
+											ssensorVector[j] =sJsonsensor;											
 	
 										}
-										gSceneList[i]=sSensorVector;//all scene list ,vector inside，
+										gSceneList[i]=ssensorVector;//all scene list ,vector inside，
 									}
 									else
 									{
@@ -175,7 +179,7 @@
 									}
 									
 									
-									var str2="<option value='"+data.rows[i].ID+"'> 场景"+data.rows[i].ID+": "+data.rows[i].NAME+"  端口："+data.rows[i].PORT+"  传感器分布："+str1+"</option>";
+									var str2="<option value='"+data.rows[i].id+"'> 场景"+data.rows[i].id+": "+data.rows[i].name+"  端口："+data.rows[i].PORT+"  传感器分布："+str1+"</option>";
 									$("#select_scene").append(str2); //为Select追加一个Option(下拉项) 
   								//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
 								}
