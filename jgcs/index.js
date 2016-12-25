@@ -5,10 +5,8 @@ var bodyParser = require('body-parser');  //已经没有包含在express中，�
 var app = express();
 var http = require('http').Server(app);
 var router = express.Router();
-
 var io = require('socket.io')(http);
 var mosca = require('mosca');
-
 var mqtt_port=1883;
 var http_port = process.env.PORT || 80;
 //构造连接数据库的连接字符串："tcp://用户名:密码@ip/相应的数据库名"
@@ -19,13 +17,11 @@ var pg = require('./pg'); //postgresql
 var mqtt = require("./mqtt");
 //加载内部模块
 var server = require("./server"); //HTTP 中间件
-
 var mqtt = require("./mqtt");
 var ws=require("./websocket");
 var MqttServer = new mosca.Server({
 	    port: mqtt_port
 	});
-
 //配置网页文件目录
 app.set('views','./html');
 //socket连接
@@ -36,15 +32,12 @@ http.listen(http_port,function(){
     console.log('正在监听'+http_port+'端口');
 });
 //
-
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname,'html')));
 
-
 //构造一个数据库对象
 var postrgresql_client = new pg.Client(DBconString);  
-
 //连接数据库，连接成功，执行回调函数
 postrgresql_client.connect(function(error, results) {
     if(error){

@@ -5,20 +5,15 @@
 	<meta http-equiv="Content-Type" content="text/css .css; charset=utf-8" > 
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>云南酷联科技有限公司</title>
-	
+ 	
 	<!--  JQUERY -->
 	<script src="../bootstrap-3.3.7-dist/js/jquery-3.1.1.min.js"></script>
-
 	<!--  BOOTSTRAP -->
 	<link href="../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
 	<script type="text/javascript" src="../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-
   <!--  JQUERY-UI (only sortable and datepicker is needed) -->
 	<link rel="stylesheet" type="text/css" href="../jquery-ui-1.12.1/jquery-ui.min.css">
 	<script type="text/javascript" src="../jquery-ui-1.12.1/jquery-ui.min.js"></script>
-	
-
-	
 	<!--  three.js -->
 	<script src="../three/js/build/three.js"></script>
 	<script src="../three/js/Detector.js"></script>
@@ -27,10 +22,8 @@
 	<script src="../three/js/loaders/MTLLoader.js"></script>
 	<script src="../three/js/loaders/OBJLoader.js"></script>
 	<script src="../three/js/libs/tween.min.js"></script>
-
 	<!--  3dzs -->
 	<script src="../lee_js/3Dzs.js"></script>
-	
 	<!--  websocket -->
 	<script src="../node_modules/socket.io-client/dist/socket.io.min.js"></script>
 	<script>
@@ -38,23 +31,17 @@
 	var socket = io();
 	</script>
 	<script src="../websocket_client.js"></script>
-
-
 	<style> 
-		.tab_div{ position:relative;width:1200px;height:600px;	border:1px solid #000} 
-		.canvas_div{ position:relative;width:1155px;height:500px} 
+		#tabs{ position:relative;width:1200px;height:600px;	border:1px solid #000} 
+		#canvas{ position:relative;width:1155px;height:500px} 
 		.wsDiv{ position:absolute;width:350px;height:600px; top:0px;left:1210px;background:#E5E5E5} 
 		#info {
 				color:#FFF;
 				position: absolute;
-				top: 100px; left: 600px;
+				top: 10px; left: 600px;
 				padding: 5px;
-
 			}
-		
-</style> 
-	
-	
+	</style> 
 	<script>
 		if (!window.WebSocket) { 
 			alert("该浏览器不支持WebSocket，系统将不能正常工作！"); 
@@ -70,20 +57,16 @@
 		*/
 		var gSceneList=new Array();//所有场景数据列表，里面放ssensorVector 
 		var gSceneID=0;//当前场景编号，0是“请选择” ，实际场景从1开始
-
-		var gRadius=6; //
-		
+		var gRadius=6; //井圈半径
 		var editor; // use a global for the submit and return data rendering in the examples
 		
 		function ss3dzs()
 		{				
 						var sensor_num=0;
 						var vectors=[];
-
 						if(gSceneID==0)//demo mode
 						{
 							//在没有选择场景之前，展示demo
-						
 							sensor_num=8;//  
 							for(var i=0;i<sensor_num;i++)
 							{
@@ -93,15 +76,13 @@
 						else 
 						{
 							sensor_num=gSceneList[gSceneID-1].length;
-
 							for(var i=0;i<sensor_num;i++)
 							{
 								vectors[i]=gSceneList[gSceneID-1][i].position_3;
 							}
-									
 						}
 						init(sensor_num,vectors);
-						animate();
+						animate();  
 		}
 		function UpdateSensorData(jsonMes)
 		{
@@ -125,12 +106,7 @@
 				 $('#messages').append($('<li>').text("收到场景中未定义的传感器主题"+topic));
 			}
 		}
-		
-
-
 		//++++++++++++++  init +++++++++++++++++++++++++++
-		
-
 		//get scene
 		$.post("/select_scenes",
   					{name:"table",col:"ID"},
@@ -142,33 +118,26 @@
 								for(var i=0;i<SceneNum;i++)  //SceneNum
 								{
 									var str1="No sensor!";
-									
 									if(data.rows[i].sensor != null)
 									{
 										var sensor_obj=data.rows[i].sensor;//sensor is object
 										var sensor_num=sensor_obj.sensors.length;
-										
 										var ssensorVector =new Array();
-										
-
 										str1="";
 										for(var j=0;j<sensor_num;j++) //sensor num
 										{
-										
 											str1=str1+"   编号:"+sensor_obj.sensors[j].id+"   主题:"+sensor_obj.sensors[j].topic+"   放置角度："+sensor_obj.sensors[j].angle;
 											//get posision of sensor
 											var angle=sensor_obj.sensors[j].angle*(2*Math.PI)/360;//;
 											var vector=new THREE.Vector3(gRadius*Math.cos(angle),gRadius*Math.sin(angle),0);
 											var sJsonsensor={
-											'topic':'',
-											'position_3':'',
-											'position_r':''
+												'topic':'',
+												'position_3':'',
+												'position_r':''
 											};
 											sJsonsensor.topic=sensor_obj.sensors[j].topic;											
 											sJsonsensor.position_3=vector;
-											
 											ssensorVector[j] =sJsonsensor;											
-	
 										}
 										gSceneList[i]=ssensorVector;//all scene list ,vector inside，
 									}
@@ -177,11 +146,8 @@
 										alert("场景配置错误，缺传感器数据！");
 										return;
 									}
-									
-									
 									var str2="<option value='"+data.rows[i].id+"'> 场景"+data.rows[i].id+": "+data.rows[i].name+"  端口："+data.rows[i].PORT+"  传感器分布："+str1+"</option>";
 									$("#select_scene").append(str2); //为Select追加一个Option(下拉项) 
-  								//$("#select_scene").prepend("<option value='0'>请选择</option>"); //为Select插入一个Option(第一个位置)
 								}
 							}
 							else
@@ -190,7 +156,6 @@
 				);
 		//+++++++++++++++++++++++++++++++++++++++++
 	</script>
-		
 	<script>
   	$(function() {
     	$( "#tabs" ).tabs();
@@ -199,30 +164,22 @@
   <script>
   	//处理场景选择
   	$(function() {
-  		
- 					
-					$("#select_scene").change(function(){
-					
-						gSceneID=$("#select_scene").val();
-						//alert("gSceneID:"+gSceneID);
-						$("#3dzs_canvas").empty(); 
-						ss3dzs();
-						
-						
-					}); //为Select添加选择事件 
-			});
+ 			$("#select_scene").change(function(){
+				gSceneID=$("#select_scene").val();
+				$("#canvas").empty(); 
+				document.getElementById("canvas").innerHTML="<div id='info' text-align:center><a href='http://www.creallies.com/' target='_blank'>酷联科技</a> - 磁场展示<br /></div>";
+				ss3dzs();
+			}); //为Select添加选择事件 
+		});
 	</script>
 
-	
 </head>
 <body>
-	
-	<div class="page-header">
-		<h1 style="font-family:'微软雅黑';">酷联科技 
-			<small style="font-family:'微软雅黑';">    井盖磁场测试系统</small> 
-		</h1>
+		<div class="page-header">
+		<h2 style="font-family:'微软雅黑';">&nbsp;酷联科技 
+			<small style="font-family:'微软雅黑';">井盖磁场测试系统</small> 
+		</h2>
 	</div>
-
 	<div class="tab_div" id=tabs >
 		<ul id="tab0">
 	   	<li class="active">  <a href="#3dzs" data-toggle="tab"> 3D实时展示 </a>  	</li>     
@@ -232,41 +189,32 @@
 	   	<li><a href="#glcj"  data-toggle="tab">关联场景</a></li>
 	   	 -->
 		</ul>
-
 		<div id="myTabContent" class="tab-content">
-			 
 	  	<div class="tab-pane fade in active" id="3dzs" >
-	  		
 	  		<form action="">
 	  		<label for="name" >当前测试场景</label>
 					<select id="select_scene" class="scene_list">
 						<option value=0 >请选择场景！</option>
 					</select>
 	  		</form>
-	  		
-	  		
-	  		<div calss=canvas_div id="3dzs_canvas"  >
+	  		<div calss="canvas_div" id="canvas"  >
 	  			<div id="info" text-align:center>
-						<a href="http://www.creallies.com/" target="_blank">酷联科技</a> - 磁场展示<br />
-						</div>
+							<a href="http://www.creallies.com/" target="_blank">酷联科技</a> - 磁场展示<br />
+					</div>
 					<script>
 						ss3dzs();
-					
 					</script>
 				</div>
 			</div>
-			
 	</div>
-		 <div class="wsDiv" >
-		
+	<div class="wsDiv" >
  			<form action="">    
  				<input id="m" autocomplete="off" style="width:300px;height:35px;"><button>Send</button>
     	</form>   
     		<ul id="messages" style="width:350px;height:550px;overflow:auto;"></ul>
 		 	<script>
 			</script>
-		 	
-		 	
-		 </div>
+	</div>
+	
 </body>
 </html>

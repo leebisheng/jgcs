@@ -6,20 +6,14 @@ var handle = {};
 handle["/select_scenes"] = func.select_scenes;
 handle["/select_scenes_d"] = func.select_scenes_d;
 function http_do(app,DBclient){
-	
 	app.get('/', function(req, res){
   	res.sendfile('./index.html');
 	});
-	
 	app.use('/', function(request, response){
 	// 解析请求，包括文件名
 	   var pathname = url.parse(request.url).pathname;
-	 
-	    	
 	   // 输出请求的文件名
 	   console.log("Request for " + pathname + " received.");
-		   
-		
     if(typeof handle[pathname] === 'function')
     {
       	handle[pathname](DBclient,response);  //执行对应的函数
@@ -27,7 +21,7 @@ function http_do(app,DBclient){
     else
     {
 		   // 从文件系统中读取请求的文件内容
-		   fs.readFile(pathname.substr(1), function (err, data) 
+		   fs.readFile(pathname.substr(1),"binary", function (err, data) 
 		   {
 		      if (err) 
 		      {
@@ -62,23 +56,21 @@ function http_do(app,DBclient){
 		         		case "woff2":
 		         			response.writeHead(200, {'Content-Type': 'application/x-font-woff'});
 		         			break;
+//		         		case "jpg":
+//		         			response.writeHead(200, {'Content-Type': 'application/x-jpg'});
+//		         			break;
 		         		default:
 		         		response.writeHead(200, {'Content-Type': 'text/plain'});	
 		         		
 		         }
-		             
-
 		         // 响应文件内容
-		         response.write(data.toString());		
+		         response.write(data.toString(),"binary");	
+		
 		      }
 		      //  发送响应数据
 		      response.end();
 		   });  
     }	
-   
-});
-	
-		
+	});
 }
-
 exports.http_do = http_do;
