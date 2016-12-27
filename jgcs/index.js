@@ -5,7 +5,9 @@ var bodyParser = require('body-parser');  //已经没有包含在express中，�
 var app = express();
 var http = require('http').Server(app);
 var router = express.Router();
+//----websocket-----
 var io = require('socket.io')(http);
+//----mqtt-----
 var mosca = require('mosca');
 var mqtt_port=1883;
 var http_port = process.env.PORT || 80;
@@ -13,12 +15,11 @@ var http_port = process.env.PORT || 80;
 var DBconString = "tcp://postgres:postgres@localhost/klkjpgdb";
 //----db-----
 var pg = require('./pg'); //postgresql
-//----mqtt-----
-var mqtt = require("./mqtt");
+
 //加载内部模块
-var server = require("./server"); //HTTP 中间件
-var mqtt = require("./mqtt");
-var ws=require("./websocket");
+var server = require("./main_js/server"); //HTTP 中间件
+var mqtt = require("./main_js/mqtt");
+var ws=require("./main_js/websocket");
 var MqttServer = new mosca.Server({
 	    port: mqtt_port
 	});
